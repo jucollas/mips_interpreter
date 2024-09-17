@@ -9,8 +9,8 @@ class Converter:
     self.formater = FormatConverter(output_format)
 
   def run(self, mips_code) -> str:
-    code_matrix = self.checker.run(mips_code)
-    return ""
-    #code_binary = self.translator.run(code_matrix)
-    #code_format = self.formater.run(code_binary)
-    #return code_format
+    tags, code, data = self.checker.run(mips_code)
+    program =  self.translator.run(tags, code, data)
+    program_format = self.formater.run(program)
+
+    return program_format

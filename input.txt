@@ -1,2 +1,357 @@
 .text
-Addi $s1 $s2 1
+main:
+    addi $s0 $zero 0x4000 # s0 = 0x4000
+    addi $s1 $zero 0x03ff # s1 = 0x03ff
+    addi $a0 $zero 0x0
+    addi $t0 $zero 0x0      # t0 = 0
+    addi $t1 $zero 0x4      # t1 = 4
+    addi $s2 $zero config # s2 = data_instruccion
+    addi $s3 $zero 0x0010 # s3 = 16
+loop01:
+beq $t0 $t1 endloop01 # t0 == t1  ?
+    add $t2 $s2 $t0       # t2 = s2 + t0
+    lw $t3 0($t2)         # t3 = t2[0]  
+    sw $t3 0($s0)         # print(t3, s0)  
+    and $t3 $t3 $s1       # t3 = t3 & s1 
+    sw $t3 0($s0)         # print(t3, s0)
+    addi $t0 $t0 0x1        # t0 = t0 + 1  
+    j loop01                
+endloop01:
+
+    addi $t0 $zero 0x0      # t0 = 0
+    addi $t1 $zero 0x5      # t1 = 5
+    addi $s2 $zero questions # s2 = questions
+
+loop02:
+    beq $t0 $t1 endloop02 # t0 == t1 ?
+    add $t2 $s2 $t0       # t2 = s2 + t0
+    lw $t3 0($t2)         # t3 = t2[0]
+    lw $t4 0($t3)         # t4 = t3[0] char 
+loop03:
+    beq $s0 $t4 finloop03
+    sw $t4 0($s0)         # print(t3, s0)  
+    and $t4 $t4 $s1       # t3 = t3 & s1 
+    sw $t4 0($s0)         # print(t3, s0)
+    addi $t3 $t3 0x1        # t2 = t2 + 1
+    lw $t4 0($t3)         # t3 = t2[0]
+    j loop03
+finloop03:
+    addi $t3 $t3 0x1
+    lw $t5 0($t3)
+    addi $t4 $zero 0x0      # t4 = 0
+loop04:
+    beq $t4 $s3 finloop04 # t4 == $s3 ?
+    lw $t3 0($s0)         # t3 = input()
+    and $t4 $t3 $s3       # t4 = t3 & 16
+    j loop04
+finloop04:
+    addi $s6 $zero 0x401
+    sw $s6 0($s0)
+    and $s6 $s6 $s1
+    sw $s6 0($s0)
+    beq $t5 $t3 bien
+    j mal
+bien:
+    addi $t2 $zero correcto
+    addi $a0 $a0 0x1
+    j imprimir
+mal:
+    addi $t2 $zero incorrecto
+
+imprimir:
+    lw $t3 0($t2)
+    beq $s0 $t3 finImprimir
+    sw $t3 0($s0)         # print(t3, s0)  
+    and $t3 $t3 $s1       # t3 = t3 & s1 
+    sw $t3 0($s0)         # print(t3, s0)
+    addi $t2 $t2 0x1        # t2 = t2 + 1
+    j imprimir
+finImprimir:
+
+    addi $t2 $zero 0x0      # t4 = 0
+loopbefore:
+    beq $t2 $s3 finloopbefore # t4 == $s3 ?
+    lw $t2 0($s0)         # t3 = input()
+    and $t2 $t2 $s3       # t4 = t3 & 16
+    j loopbefore
+finloopbefore:
+    addi $s6 $zero 0x401
+    sw $s6 0($s0)
+    and $s6 $s6 $s1
+    sw $s6 0($s0)
+
+    addi $t0 $t0 0x1
+    j loop02
+
+endloop02:
+
+addi $t2 $zero puntuacion
+
+imprimirEnd:
+    lw $t3 0($t2)
+    beq $s0 $t3 finImprimirEnd
+    sw $t3 0($s0)         # print(t3, s0)  
+    and $t3 $t3 $s1       # t3 = t3 & s1 
+    sw $t3 0($s0)         # print(t3, s0)
+    addi $t2 $t2 0x1        # t2 = t2 + 1
+    j imprimirEnd
+finImprimirEnd:
+    addi $a1 $a0 0x530
+    sw $a1 0($s0)         # print(t3, s0)  
+    and $a1 $a1 $s1       # t3 = t3 & s1 
+    sw $a1 0($s0)
+
+    addi $s3 $zero 0x4
+    and $t6 $a0 $s3
+    beq $t6 $s3 ganaste
+perdiste:
+    addi $t2 $zero fall
+    j finfin
+
+ganaste:
+    addi $t2 $zero goal
+
+finfin:
+    lw $t3 0($t2)
+    beq $s0 $t3 End
+    sw $t3 0($s0)         # print(t3, s0)  
+    and $t3 $t3 $s1       # t3 = t3 & s1 
+    sw $t3 0($s0)         # print(t3, s0)
+    addi $t2 $t2 0x1        # t2 = t2 + 1
+    j finfin
+
+End:
+    j End
+
+
+.data
+config:
+        0x0000040f
+        0x0000043f
+        0x0000040e
+        0x00000401
+        
+correcto:
+    0x00000563
+    0x0000056F
+    0x00000572
+    0x00000572
+    0x00000565
+    0x00000563
+    0x00000574
+    0x0000056F
+    0x00004000
+
+incorrecto:
+    0x00000569
+    0x0000056E
+    0x00000563
+    0x0000056F
+    0x00000572
+    0x00000572
+    0x00000565
+    0x00000563
+    0x00000574
+    0x0000056F
+    0x00004000
+puntuacion:
+    0x00000570 
+    0x00000575 
+    0x0000056E 
+    0x00000574 
+    0x00000575 
+    0x00000561 
+    0x00000563 
+    0x00000569 
+    0x00000553 
+    0x0000056E 
+    0x0000053A 
+    0x00004000
+    
+goal:
+    0x000004c0
+    0x00000567 
+    0x00000561 
+    0x0000056E 
+    0x00000561 
+    0x00000573 
+    0x00000574 
+    0x00000565
+    0x00004000  
+fall:
+    0x000004c0
+    0x00000570 
+    0x00000565 
+    0x00000572 
+    0x00000564 
+    0x00000569 
+    0x00000573 
+    0x00000574 
+    0x00000565
+    0x00004000
+    
+         
+questions:
+        0x00000093
+        0x000000ac
+        0x000000cb
+        0x000000e9
+        0x00000107
+         
+questions01:
+        0x00000532
+        0x0000052b
+        0x00000532
+        0x0000052a
+        0x00000532
+        0x0000053d
+        0x0000053f
+        0x000004C0
+        0x00000561
+        0x00000529
+        0x00000534
+        0x00000520
+        0x00000562
+        0x00000529
+        0x00000536
+        0x00000520
+        0x00000563
+        0x00000529
+        0x00000538
+        0x00000520
+        0x00000564
+        0x00000529
+        0x00000531
+        0x00004000
+        0x00000012 
+questions02:
+        0x0000004E
+        0x0000002E
+        0x00000563
+        0x0000056f
+        0x0000056e
+        0x00000574
+        0x00000569
+        0x0000056e
+        0x00000565
+        0x0000056e
+        0x00000574
+        0x00000565
+        0x00000573
+        0x000004C0
+        0x00000561 
+        0x00000529 # )
+        0x00000535
+        0x00000520
+        0x00000562 # b 
+        0x00000529 # )
+        0x00000536
+        0x00000520 
+        0x00000563 # c
+        0x00000529 # )
+        0x00000537
+        0x00000520 
+        0x00000564 # d
+        0x00000529 #)
+        0x00000532
+       0x00004000
+       0x00000011
+    
+question3:
+    0x00000547
+    0x00000561
+    0x00000573
+    0x00000520
+    0x00000565
+    0x0000056E
+    0x00000520
+    0x00000567
+    0x0000056C
+    0x0000056F
+    0x00000562
+    0x0000056F
+    0x00000573
+    0x0000053F
+    0x000004c0
+    
+    0x00000561 # a
+    0x00000529 # )
+    0x00000543
+    0x00000520
+    0x00000562 # b
+    0x00000529 # )
+    0x00000548
+    0x00000565
+    0x00000520
+    0x00000563 # c
+    0x00000529 # )
+    0x00000548
+    0x00000520
+    0x00000564 # d
+    0x00000529 # )
+    0x0000054b
+    0x00004000
+    0x00000012
+    
+question4:
+    0x0000054C
+    0x0000052E
+    0x00000520
+    0x00000564
+    0x00000565
+    0x0000056C
+    0x00000520
+    0x00000563
+    0x00000575
+    0x00000561
+    0x00000564
+    0x00000572
+    0x00000561
+    0x00000564
+    0x0000056F
+    0x000004c0
+    0x00000561 # a
+    0x00000529 # )
+    0x00000539
+    0x00000520
+    0x00000562 # b
+    0x00000529 # )
+    0x00000534
+    0x00000520
+    0x00000563 # c
+    0x00000529 # )
+    0x00000537
+    0x00000520
+    0x00000564 # d
+    0x00000529 # )
+    0x00000531
+    0x00004000
+    0x00000012
+question5:
+    0x00000543 
+    0x0000056F 
+    0x00000576 
+    0x00000569 
+    0x00000564 
+    0x0000055F 
+    0x0000053A
+    0x000004c0
+    0x00000561 # a
+    0x00000529 # )
+    0x00000531
+    0x00000539
+    0x00000520
+    0x00000562 # b
+    0x00000529 # )
+    0x00000532
+    0x00000520
+    0x00000563 # c
+    0x00000529 # )
+    0x00000530
+    0x00000520
+    0x00000564 # d
+    0x00000529 # )
+    0x00000531
+    0x00004000
+    0x00000011
+.end
